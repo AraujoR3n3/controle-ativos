@@ -1,0 +1,557 @@
+package com.ativos;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
+
+import java.io.FileWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class App extends Application {
+
+    @Override
+    public void start(Stage stage) {
+
+        Label titulo = new Label("Cadastro de Ativos");
+
+        ComboBox<String> cbCD = new ComboBox<>();
+        cbCD.getItems().addAll(
+                "CD Repassa",
+                "CD 504 Renner",
+                "CM01"
+        );
+        cbCD.setPromptText("Selecione o CD");
+
+        TextField txtEquipamento = new TextField();
+        txtEquipamento.setPromptText("Equipamento");
+
+        TextField txtMarca = new TextField();
+        txtMarca.setPromptText("Marca");
+
+        TextField txtModelo = new TextField();
+        txtModelo.setPromptText("Modelo");
+
+        TextField txtSerial = new TextField();
+        txtSerial.setPromptText("Serial Number");
+
+        TextField txtPatrimonio = new TextField();
+        txtPatrimonio.setPromptText("Patrimônio");
+        TextField txtHost = new TextField();
+        txtHost.setPromptText("Host");
+
+        TextField txtLocal = new TextField();
+        txtLocal.setPromptText("Local");
+
+        ComboBox<String> cbCondicao = new ComboBox<>();
+        cbCondicao.getItems().addAll(
+                "Novo",
+                "Usado"
+        );
+        cbCondicao.setPromptText("Condição");
+
+        ComboBox<String> cbSituacao = new ComboBox<>();
+        cbSituacao.getItems().addAll(
+                "Ativo",
+                "Estoque",
+                "Retirado",
+                "Manutenção"
+        );
+        cbSituacao.setPromptText("Situação");
+
+        TextField txtResponsavel = new TextField();
+        txtResponsavel.setPromptText("Responsável");
+        ComboBox<String> cbStatus = new ComboBox<>();
+        cbStatus.getItems().addAll(
+                "Ativo",
+                "Estoque",
+                "Manutenção"
+        );
+        cbStatus.setPromptText("Status");
+
+        TextArea txtObs = new TextArea();
+        txtObs.setPromptText("Observações");
+
+        Button btnSalvar = new Button("Salvar");
+        Button btnExportar = new Button("Exportar CSV");
+        Button btnAtualizar = new Button("Atualizar");
+        Label lblFiltro = new Label("Filtro CD:");
+        Label lblTotal = new Label("Total de Ativos: 0");
+
+        ComboBox<String> cbFiltroCD = new ComboBox<>();
+
+        cbFiltroCD.getItems().addAll(
+                "Todos",
+                "CD Repassa",
+                "CD 504 Renner",
+                "CM01"
+        );
+
+        cbFiltroCD.setValue("Todos");
+        TableView<String[]> tabela = new TableView<>();
+        tabela.setPrefHeight(350);
+        TableColumn<String[], String> colCD =
+                new TableColumn<>("CD");
+        TableColumn<String[], String> colEquipamento =
+                new TableColumn<>("Equipamento");
+
+        colEquipamento.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[1])
+        );
+
+        TableColumn<String[], String> colHost =
+                new TableColumn<>("Host");
+
+        colHost.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[2])
+        );
+
+        TableColumn<String[], String> colLocal =
+                new TableColumn<>("Local");
+
+        colLocal.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[4])
+        );
+
+        colCD.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[0])
+        );
+
+        TableColumn<String[], String> colPatrimonio =
+                new TableColumn<>("Patrimônio");
+
+        colPatrimonio.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[3])
+        );
+
+        TableColumn<String[], String> colSerial =
+                new TableColumn<>("Serial");
+
+        colSerial.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[2])
+        );
+
+        TableColumn<String[], String> colResponsavel =
+                new TableColumn<>("Responsável");
+
+        colResponsavel.setCellValueFactory(data ->
+                new SimpleStringProperty(data.getValue()[5])
+        );
+
+        tabela.getColumns().addAll(
+                colCD,
+                colEquipamento,
+                colHost,
+                colPatrimonio,
+                colLocal,
+                colResponsavel
+        );
+
+        colCD.setPrefWidth(140);
+        colEquipamento.setPrefWidth(180);
+        colHost.setPrefWidth(140);
+        colPatrimonio.setPrefWidth(140);
+        colLocal.setPrefWidth(140);
+        colResponsavel.setPrefWidth(220);
+
+        Runnable carregarTabela = () -> {
+
+            tabela.getItems().clear();
+
+            try {
+
+                Connection conn = Database.connect();
+
+                if (cbFiltroCD.getValue().equals("Todos")) {
+
+                    Statement stmt = conn.createStatement();
+
+                    ResultSet rs = stmt.executeQuery(
+                            """
+                            SELECT
+                                cd,
+                                equipamento,
+                                host,
+                                patrimonio,
+                                local,
+                                responsavel
+                            FROM ativos
+                            ORDER BY cd
+                            """
+                    );
+
+                    while (rs.next()) {
+
+                        tabela.getItems().add(
+                                new String[]{
+                                        rs.getString("cd"),
+                                        rs.getString("equipamento"),
+                                        rs.getString("host"),
+                                        rs.getString("patrimonio"),
+                                        rs.getString("local"),
+                                        rs.getString("responsavel")
+                                }
+                        );
+                    }
+
+                } else {
+
+                    PreparedStatement ps = conn.prepareStatement(
+                            """
+                            SELECT
+                                cd,
+                                equipamento,
+                                host,
+                                patrimonio,
+                                local,
+                                responsavel
+                            FROM ativos
+                            WHERE cd = ?
+                            ORDER BY cd
+                            """
+                    );
+
+                    ps.setString(1, cbFiltroCD.getValue());
+
+                    ResultSet rs = ps.executeQuery();
+
+                    while (rs.next()) {
+
+                        tabela.getItems().add(
+                                new String[]{
+                                        rs.getString("cd"),
+                                        rs.getString("equipamento"),
+                                        rs.getString("host"),
+                                        rs.getString("patrimonio"),
+                                        rs.getString("local"),
+                                        rs.getString("responsavel")
+                                }
+                        );
+                    }
+                }
+
+                lblTotal.setText(
+                        "Total de Ativos: "
+                                + tabela.getItems().size()
+                );
+
+                conn.close();
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+            }
+        };
+
+        carregarTabela.run();
+
+        cbFiltroCD.setOnAction(
+                e -> carregarTabela.run()
+        );
+
+        btnAtualizar.setOnAction(
+                e -> carregarTabela.run()
+        );
+
+        btnSalvar.setOnAction(e -> {
+
+            try {
+
+                Connection conn = Database.connect();
+                if (cbCD.getValue() == null ||
+                        txtEquipamento.getText().trim().isEmpty() ||
+                        txtSerial.getText().trim().isEmpty() ||
+                        txtPatrimonio.getText().trim().isEmpty()) {
+
+                    new Alert(
+                            Alert.AlertType.WARNING,
+                            """
+                            Preencha os campos obrigatórios:
+                
+                            • CD
+                            • Equipamento
+                            • Serial
+                            • Patrimônio
+                            """
+                    ).show();
+
+                    return;
+                }
+
+                if (conn == null) {
+
+                    new Alert(
+                            Alert.AlertType.ERROR,
+                            "Erro na conexão com banco ❌"
+                    ).show();
+
+                    return;
+                }
+
+                String checkSql =
+                        "SELECT COUNT(*) FROM ativos WHERE patrimonio = ? OR serial = ?";
+
+                PreparedStatement checkStmt =
+                        conn.prepareStatement(checkSql);
+
+                checkStmt.setString(1, txtPatrimonio.getText().trim());
+                checkStmt.setString(2, txtSerial.getText().trim());
+
+                ResultSet rs = checkStmt.executeQuery();
+
+                if (rs.next() && rs.getInt(1) > 0) {
+
+                    new Alert(
+                            Alert.AlertType.ERROR,
+                            "Serial ou patrimônio já cadastrado ❌"
+                    ).show();
+
+                    conn.close();
+                    return;
+                }
+
+                String sql =
+                        """
+                        INSERT INTO ativos
+                        (
+                            cd,
+                            equipamento,
+                            marca,
+                            modelo,
+                            serial,
+                            host,
+                            patrimonio,
+                            local,
+                            status,
+                            condicao,
+                            situacao,
+                            observacoes,
+                            responsavel
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """;
+
+                PreparedStatement stmt =
+                        conn.prepareStatement(sql);
+
+                stmt.setString(1, cbCD.getValue());
+                stmt.setString(2, txtEquipamento.getText());
+                stmt.setString(3, txtMarca.getText());
+                stmt.setString(4, txtModelo.getText());
+
+                stmt.setString(5, txtSerial.getText());
+                stmt.setString(6, txtHost.getText());
+
+                stmt.setString(7, txtPatrimonio.getText());
+                stmt.setString(8, txtLocal.getText());
+
+                stmt.setString(9, cbStatus.getValue());
+                stmt.setString(10, cbCondicao.getValue());
+                stmt.setString(11, cbSituacao.getValue());
+
+                stmt.setString(12, txtObs.getText());
+                stmt.setString(13, txtResponsavel.getText());
+
+                stmt.executeUpdate();
+                carregarTabela.run();
+                conn.close();
+
+                new Alert(
+                        Alert.AlertType.INFORMATION,
+                        "Ativo salvo com sucesso ✅"
+                ).show();
+
+                cbCD.setValue(null);
+                txtEquipamento.clear();
+                txtMarca.clear();
+                txtModelo.clear();
+                txtSerial.clear();
+                txtPatrimonio.clear();
+                cbStatus.setValue(null);
+                txtObs.clear();
+                txtHost.clear();
+                txtLocal.clear();
+                txtResponsavel.clear();
+
+                cbCondicao.setValue(null);
+                cbSituacao.setValue(null);
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Erro ao salvar ❌"
+                ).show();
+            }
+        });
+
+        btnExportar.setOnAction(e -> {
+
+            try {
+
+                FileWriter writer =
+                        new FileWriter("ativos.csv");
+
+                writer.append(
+                        "CD;Equipamento;Marca;Modelo;Serial;Host;Patrimonio;Local;Status;Condicao;Situacao;Responsavel;Observacoes\n"
+                );
+
+                Connection conn = Database.connect();
+
+                Statement stmt =
+                        conn.createStatement();
+
+                ResultSet rs =
+                        stmt.executeQuery(
+                                "SELECT * FROM ativos"
+                        );
+
+                while (rs.next()) {
+
+                    writer.append(
+                            rs.getString("cd") + ";"
+                                    + rs.getString("equipamento") + ";"
+                                    + rs.getString("marca") + ";"
+                                    + rs.getString("modelo") + ";"
+                                    + rs.getString("serial") + ";"
+                                    + rs.getString("host") + ";"
+                                    + rs.getString("patrimonio") + ";"
+                                    + rs.getString("local") + ";"
+                                    + rs.getString("status") + ";"
+                                    + rs.getString("condicao") + ";"
+                                    + rs.getString("situacao") + ";"
+                                    + rs.getString("responsavel") + ";"
+                                    + rs.getString("observacoes")
+                                    + "\n"
+                    );
+                }
+
+                writer.close();
+                conn.close();
+
+                new Alert(
+                        Alert.AlertType.INFORMATION,
+                        "Arquivo ativos.csv criado ✅"
+                ).show();
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Erro ao exportar ❌"
+                ).show();
+            }
+        });
+
+        txtEquipamento.setPrefWidth(300);
+        txtMarca.setPrefWidth(180);
+        txtModelo.setPrefWidth(180);
+
+        txtSerial.setPrefWidth(250);
+        txtHost.setPrefWidth(250);
+
+        txtPatrimonio.setPrefWidth(250);
+        txtLocal.setPrefWidth(250);
+
+        txtResponsavel.setPrefWidth(500);
+
+// Linhas da interface
+
+        HBox linhaEquipamento = new HBox(
+                10,
+                txtEquipamento,
+                txtMarca,
+                txtModelo
+        );
+
+        HBox linhaSerial = new HBox(
+                10,
+                txtSerial,
+                txtHost
+        );
+
+        HBox linhaPatrimonio = new HBox(
+                10,
+                txtPatrimonio,
+                txtLocal
+        );
+
+        HBox linhaStatus = new HBox(
+                10,
+                cbStatus,
+                cbCondicao,
+                cbSituacao
+        );
+
+        HBox linhaBotoes = new HBox(
+                10,
+                btnSalvar,
+                btnExportar,
+                btnAtualizar
+        );
+
+        VBox layout = new VBox(10);
+        HBox linhaFiltro = new HBox(
+                10,
+                lblFiltro,
+                cbFiltroCD
+        );
+
+        layout.setPadding(new Insets(20));
+
+        layout.getChildren().addAll(
+                titulo,
+                cbCD,
+
+                linhaEquipamento,
+
+                linhaSerial,
+
+                linhaPatrimonio,
+
+                linhaStatus,
+
+                txtResponsavel,
+
+                txtObs,
+
+                linhaBotoes,
+
+                linhaFiltro,
+
+                lblTotal,
+
+                tabela
+        );
+
+        Scene scene = new Scene(layout, 1000, 600);
+
+        stage.setTitle("Controle de Ativos");
+
+        stage.setScene(scene);
+
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch();
+    }
+}

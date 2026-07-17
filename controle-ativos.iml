@@ -10,5 +10,6 @@
     <orderEntry type="library" exported="" name="slf4j-simple-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="javafx" level="project" />
     <orderEntry type="library" exported="" name="sqlite-jdbc-3.46.0.0" level="project" />
+    <orderEntry type="library" name="apache.poi.ooxml" level="project" />
   </component>
 </module>

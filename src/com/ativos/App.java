@@ -563,157 +563,9 @@ public class App extends Application {
 // EVENTO SALVAR
 // ======================================================
 
-        btnSalvar.setOnAction(e -> {
-
-            try {
-
-                Connection conn = Database.connect();
-
-                if (cbUnidade.getValue() == null
-                        || txtEquipamento.getText().trim().isEmpty()
-                        || txtSerial.getText().trim().isEmpty()
-                        || txtPatrimonio.getText().trim().isEmpty()) {
-
-                    new Alert(
-                            Alert.AlertType.WARNING,
-                            "ENTROU NO IF DE VALIDACAO"
-                    ).show();
-
-                    return;
-                }
-
-                if (modoEdicao[0]) {
-
-                    Ativo ativo = new Ativo(
-                            cbEmpresa.getValue(),
-                            cbUnidade.getValue(),
-                            txtEquipamento.getText(),
-                            txtMarca.getText(),
-                            txtModelo.getText(),
-                            txtSerial.getText(),
-                            txtHost.getText(),
-                            txtPatrimonio.getText(),
-                            txtLocal.getText(),
-                            cbStatus.getValue(),
-                            cbCondicao.getValue(),
-                            cbSituacao.getValue(),
-                            txtResponsavel.getText(),
-                            txtObs.getText()
-                    );
-
-                    AtivoDAO dao = new AtivoDAO();
-
-                    dao.atualizar(
-                            ativo,
-                            patrimonioOriginal[0]
-                    );
-
-                    modoEdicao[0] = false;
-
-                    carregarTabela(
-                            tabela,
-                            cbFiltroUnidade,
-                            lblTotal
-                    );
-
-                    new Alert(
-                            Alert.AlertType.INFORMATION,
-                            "Registro atualizado com sucesso ✅"
-                    ).show();
-
-                    return;
-                }
-
-                String checkSql =
-                        "SELECT COUNT(*) FROM ativos WHERE patrimonio = ? OR serial = ?";
-
-                PreparedStatement checkStmt =
-                        conn.prepareStatement(checkSql);
-
-                checkStmt.setString(
-                        1,
-                        txtPatrimonio.getText().trim()
-                );
-
-                checkStmt.setString(
-                        2,
-                        txtSerial.getText().trim()
-                );
-
-                ResultSet rs =
-                        checkStmt.executeQuery();
-
-                if (rs.next() && rs.getInt(1) > 0) {
-
-                    new Alert(
-                            Alert.AlertType.ERROR,
-                            "Serial ou patrimônio já cadastrado ❌"
-                    ).show();
-
-                    conn.close();
-
-                    return;
-                }
-
-                conn.close();
-
-                Ativo novoAtivo = new Ativo(
-                        cbEmpresa.getValue(),
-                        cbUnidade.getValue(),
-                        txtEquipamento.getText(),
-                        txtMarca.getText(),
-                        txtModelo.getText(),
-                        txtSerial.getText(),
-                        txtHost.getText(),
-                        txtPatrimonio.getText(),
-                        txtLocal.getText(),
-                        cbStatus.getValue(),
-                        cbCondicao.getValue(),
-                        cbSituacao.getValue(),
-                        txtResponsavel.getText(),
-                        txtObs.getText()
-                );
-
-                AtivoDAO dao = new AtivoDAO();
-                dao.salvar(novoAtivo);
-
-                carregarTabela(
-                        tabela,
-                        cbFiltroUnidade,
-                        lblTotal
-                );
-
-                new Alert(
-                        Alert.AlertType.INFORMATION,
-                        "Ativo salvo com sucesso ✅"
-                ).show();
-
-                limparFormulario(
-                        cbUnidade,
-                        txtEquipamento,
-                        txtMarca,
-                        txtModelo,
-                        txtSerial,
-                        txtPatrimonio,
-                        txtHost,
-                        txtLocal,
-                        txtResponsavel,
-                        txtObs,
-                        cbStatus,
-                        cbCondicao,
-                        cbSituacao
-                );
-
-            } catch (Exception ex) {
-
-                ex.printStackTrace();
-
-                new Alert(
-                        Alert.AlertType.ERROR,
-                        "Erro ao salvar ❌"
-                ).show();
-            }
-        });
+        btnSalvar.setOnAction(
+                e -> salvarAtivo()
+        );
 
 // ======================================================
 // EXPORTAÇÃO EXCEL
@@ -840,6 +692,10 @@ public class App extends Application {
 
         stage.show();
 
+    }
+    private void salvarAtivo() {
+
+        System.out.println("salvarAtivo() chamado");
     }
 
     private void exportarExcel() {

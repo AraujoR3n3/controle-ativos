@@ -564,9 +564,11 @@ public class App extends Application {
 // ======================================================
 
         btnSalvar.setOnAction(
-                e -> salvarAtivo()
+                e -> salvarAtivo(
+                        cbEmpresa,
+                        cbUnidade
+                )
         );
-
 // ======================================================
 // EXPORTAÇÃO EXCEL
 // ======================================================
@@ -693,7 +695,10 @@ public class App extends Application {
         stage.show();
 
     }
-    private void salvarAtivo() {
+    private void salvarAtivo(
+            ComboBox<String> cbEmpresa,
+            ComboBox<String> cbUnidade
+    ) {
 
         System.out.println("salvarAtivo() chamado");
     }

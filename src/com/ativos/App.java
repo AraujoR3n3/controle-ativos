@@ -417,64 +417,13 @@ public class App extends Application {
 // ======================================================
 // EVENTO EXCLUIR
 // ======================================================
-
-        btnExcluir.setOnAction(e -> {
-
-            String[] ativo =
-                    tabela.getSelectionModel()
-                            .getSelectedItem();
-
-            if (ativo == null) {
-
-                new Alert(
-                        Alert.AlertType.WARNING,
-                        "Selecione um ativo para excluir."
-                ).show();
-
-                return;
-            }
-
-            // índice 4 = patrimônio
-            String patrimonioSelecionado =
-                    ativo[4];
-
-            Alert confirmacao =
-                    new Alert(
-                            Alert.AlertType.CONFIRMATION,
-                            "Deseja realmente excluir o patrimônio "
-                                    + patrimonioSelecionado
-                                    + " ?"
-                    );
-
-            confirmacao.showAndWait();
-
-            if (confirmacao.getResult() != ButtonType.OK) {
-                return;
-            }
-
-            try {
-
-                AtivoDAO dao = new AtivoDAO();
-                dao.excluir(
-                        patrimonioSelecionado
-                );
-
-                carregarTabela(
+        btnExcluir.setOnAction(
+                e -> excluirAtivo(
                         tabela,
                         cbFiltroUnidade,
                         lblTotal
-                );
-
-                new Alert(
-                        Alert.AlertType.INFORMATION,
-                        "Registro excluído com sucesso ✅"
-                ).show();
-
-            } catch (Exception ex) {
-
-                ex.printStackTrace();
-            }
-        });
+                )
+        );
 
         btnLocalidades.setOnAction(
                 e -> new LocalidadeView().show()
@@ -640,6 +589,68 @@ public class App extends Application {
 
         stage.show();
 
+    }
+
+    private void excluirAtivo(
+            TableView<String[]> tabela,
+            ComboBox<String> cbFiltroUnidade,
+            Label lblTotal
+    ) {
+
+        String[] ativo =
+                tabela.getSelectionModel()
+                        .getSelectedItem();
+
+        if (ativo == null) {
+
+            new Alert(
+                    Alert.AlertType.WARNING,
+                    "Selecione um ativo para excluir."
+            ).show();
+
+            return;
+        }
+
+        String patrimonioSelecionado =
+                ativo[4];
+
+        Alert confirmacao =
+                new Alert(
+                        Alert.AlertType.CONFIRMATION,
+                        "Deseja realmente excluir o patrimônio "
+                                + patrimonioSelecionado
+                                + " ?"
+                );
+
+        confirmacao.showAndWait();
+
+        if (confirmacao.getResult() != ButtonType.OK) {
+            return;
+        }
+
+        try {
+
+            AtivoDAO dao = new AtivoDAO();
+
+            dao.excluir(
+                    patrimonioSelecionado
+            );
+
+            carregarTabela(
+                    tabela,
+                    cbFiltroUnidade,
+                    lblTotal
+            );
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Registro excluído com sucesso ✅"
+            ).show();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+        }
     }
 
     private void editarAtivo(

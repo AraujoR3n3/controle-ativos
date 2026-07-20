@@ -719,7 +719,9 @@ public class App extends Application {
 // EXPORTAÇÃO EXCEL
 // ======================================================
 
-
+        btnExportar.setOnAction(
+                e -> exportarExcel()
+        );
 
         txtEquipamento.setPrefWidth(300);
         txtMarca.setPrefWidth(180);
@@ -838,6 +840,15 @@ public class App extends Application {
 
         stage.show();
 
+
+    }
+
+    private void exportarExcel() {
+
+        new Alert(
+                Alert.AlertType.INFORMATION,
+                "Método exportarExcel() funcionando ✅"
+        ).show();
     }
 
     private void limparFormulario(

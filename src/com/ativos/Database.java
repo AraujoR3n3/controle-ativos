@@ -28,49 +28,46 @@ public class Database {
             // Tabela principal dos ativos
             String sql = """
                     CREATE TABLE IF NOT EXISTS ativos (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-                        cd TEXT,
-
-                        equipamento TEXT,
-                        marca TEXT,
-                        modelo TEXT,
-
-                        serial TEXT UNIQUE,
-                        host TEXT,
-
-                        patrimonio TEXT UNIQUE,
-                        local TEXT,
-
-                        status TEXT,
-                        condicao TEXT,
-                        situacao TEXT,
-
-                        observacoes TEXT,
-                        responsavel TEXT
-                    )
+                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     
+                         empresa TEXT,
+                         cd TEXT,
+                     
+                         equipamento TEXT,
+                         marca TEXT,
+                         modelo TEXT,
+                     
+                         serial TEXT UNIQUE,
+                         host TEXT,
+                     
+                         patrimonio TEXT UNIQUE,
+                         local TEXT,
+                     
+                         status TEXT,
+                         condicao TEXT,
+                         situacao TEXT,
+                     
+                         observacoes TEXT,
+                         responsavel TEXT
+                     )
                     """;
 
             stmt.execute(sql);
 
             // Tabela de unidades
             String sqlUnidades = """
-                    CREATE TABLE IF NOT EXISTS unidades (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        nome TEXT NOT NULL UNIQUE
-                    )
-                    """;
+        CREATE TABLE IF NOT EXISTS unidades (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            empresa_id INTEGER,
+            FOREIGN KEY (empresa_id)
+                REFERENCES empresas(id)
+        )
+        """;
 
             stmt.execute(sqlUnidades);
 
-            // Unidades padrão
-            stmt.execute("""
-                    INSERT OR IGNORE INTO unidades(nome)
-                    VALUES
-                    ('CD Repassa'),
-                    ('CM01'),
-                    ('CD 504 Renner')
-                    """);
+
 
             // Tabela de empresas
             String sqlEmpresas = """
@@ -82,12 +79,6 @@ public class Database {
 
             stmt.execute(sqlEmpresas);
 
-// Empresa padrão
-            stmt.execute("""
-        INSERT OR IGNORE INTO empresas(nome)
-        VALUES
-        ('Repassa')
-        """);
 
             System.out.println("✅ Banco conectado");
 

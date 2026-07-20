@@ -429,9 +429,17 @@ public class App extends Application {
                 e -> new LocalidadeView().show()
         );
 
-        btnEmpresas.setOnAction(
-                e -> new EmpresaView().show()
-        );
+        btnEmpresas.setOnAction(e -> {
+
+            EmpresaView view =
+                    new EmpresaView();
+
+            view.show();
+
+            view.getJanela().setOnHidden(event ->
+                    carregarEmpresas(cbEmpresa)
+            );
+        });
 
         btnDashboard.setOnAction(
                 e -> new DashboardView().show()

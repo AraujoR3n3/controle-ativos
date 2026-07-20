@@ -20,52 +20,43 @@ public class EmpresaView {
 
     private static Stage janela;
 
+    // ======================================================
+    // EXIBIR JANELA
+    // ======================================================
+
     public void show() {
 
         if (janela != null && janela.isShowing()) {
-
             janela.toFront();
-
             return;
         }
 
         janela = new Stage();
+        janela.setTitle("Cadastro de Empresas");
 
-        janela.setTitle(
-                "Cadastro de Empresas"
-        );
+        Label lblEmpresa = new Label("Empresa:");
 
-        Label lblEmpresa =
-                new Label("Empresa:");
+        TextField txtEmpresa = new TextField();
 
-        TextField txtEmpresa =
-                new TextField();
+        Button btnSalvar = new Button("Salvar");
+        Button btnExcluir = new Button("Excluir");
 
-        Button btnSalvar =
-                new Button("Salvar");
-
-        Button btnExcluir =
-                new Button("Excluir");
-
-        TableView<String> tabelaEmpresas =
-                new TableView<>();
+        TableView<String> tabelaEmpresas = new TableView<>();
 
         TableColumn<String, String> colEmpresa =
                 new TableColumn<>("Empresa");
 
         colEmpresa.setCellValueFactory(data ->
-                new SimpleStringProperty(
-                        data.getValue()
-                )
+                new SimpleStringProperty(data.getValue())
         );
 
-        tabelaEmpresas.getColumns().add(
-                colEmpresa
-        );
+        tabelaEmpresas.getColumns().add(colEmpresa);
 
-        carregarEmpresas(
-                tabelaEmpresas
-        );
+        carregarEmpresas(tabelaEmpresas);
+
+        // ======================================================
+        // SALVAR EMPRESA
+        // ======================================================
 
         btnSalvar.setOnAction(e -> {
 
@@ -81,12 +72,9 @@ public class EmpresaView {
 
             try {
 
-                EmpresaDAO dao =
-                        new EmpresaDAO();
+                EmpresaDAO dao = new EmpresaDAO();
 
-                dao.salvar(
-                        txtEmpresa.getText().trim()
-                );
+                dao.salvar(txtEmpresa.getText().trim());
 
                 tabelaEmpresas.getItems().add(
                         txtEmpresa.getText().trim()
@@ -109,6 +97,10 @@ public class EmpresaView {
                 ).showAndWait();
             }
         });
+
+        // ======================================================
+        // EXCLUIR EMPRESA
+        // ======================================================
 
         btnExcluir.setOnAction(e -> {
 
@@ -133,16 +125,13 @@ public class EmpresaView {
                             "Deseja realmente excluir esta empresa?"
                     );
 
-            if (confirmacao.showAndWait().get()
-                    != ButtonType.OK) {
-
+            if (confirmacao.showAndWait().get() != ButtonType.OK) {
                 return;
             }
 
             try {
 
-                Connection conn =
-                        Database.connect();
+                Connection conn = Database.connect();
 
                 PreparedStatement verificaEmpresa =
                         conn.prepareStatement(
@@ -168,30 +157,27 @@ public class EmpresaView {
 
                     new Alert(
                             Alert.AlertType.WARNING,
-                            "Não é possível excluir esta empresa.\nExistem localidades vinculadas."
+                            """
+                            Não é possível excluir esta empresa.
+                            Existem localidades vinculadas.
+                            """
                     ).showAndWait();
 
                     conn.close();
-
                     return;
                 }
+
                 rsVerifica.close();
                 verificaEmpresa.close();
                 conn.close();
 
-                EmpresaDAO dao =
-                        new EmpresaDAO();
+                EmpresaDAO dao = new EmpresaDAO();
 
-                dao.excluir(
+                dao.excluir(empresaSelecionada);
+
+                tabelaEmpresas.getItems().remove(
                         empresaSelecionada
                 );
-
-                tabelaEmpresas.getItems()
-                        .remove(
-                                empresaSelecionada
-                        );
-
-                conn.close();
 
                 new Alert(
                         Alert.AlertType.INFORMATION,
@@ -209,28 +195,21 @@ public class EmpresaView {
             }
         });
 
-        tabelaEmpresas.setPrefHeight(
-                250
-        );
+        tabelaEmpresas.setPrefHeight(250);
 
-        VBox layout =
-                new VBox(
+        VBox layout = new VBox(
+                10,
+                lblEmpresa,
+                txtEmpresa,
+                new HBox(
                         10,
-                        lblEmpresa,
-                        txtEmpresa,
-
-                        new HBox(
-                                10,
-                                btnSalvar,
-                                btnExcluir
-                        ),
-
-                        tabelaEmpresas
-                );
-
-        layout.setPadding(
-                new Insets(15)
+                        btnSalvar,
+                        btnExcluir
+                ),
+                tabelaEmpresas
         );
+
+        layout.setPadding(new Insets(15));
 
         janela.setScene(
                 new Scene(
@@ -243,26 +222,29 @@ public class EmpresaView {
         janela.show();
     }
 
+    // ======================================================
+    // CARREGAR EMPRESAS
+    // ======================================================
+
     private void carregarEmpresas(
             TableView<String> tabela
     ) {
 
+        tabela.getItems().clear();
+
         try {
 
-            Connection conn =
-                    Database.connect();
+            Connection conn = Database.connect();
 
-            Statement stmt =
-                    conn.createStatement();
+            Statement stmt = conn.createStatement();
 
-            ResultSet rs =
-                    stmt.executeQuery(
-                            """
-                            SELECT nome
-                            FROM empresas
-                            ORDER BY nome
-                            """
-                    );
+            ResultSet rs = stmt.executeQuery(
+                    """
+                    SELECT nome
+                    FROM empresas
+                    ORDER BY nome
+                    """
+            );
 
             while (rs.next()) {
 
@@ -277,5 +259,13 @@ public class EmpresaView {
 
             ex.printStackTrace();
         }
+    }
+
+    // ======================================================
+    // RETORNAR JANELA
+    // ======================================================
+
+    public Stage getJanela() {
+        return janela;
     }
 }

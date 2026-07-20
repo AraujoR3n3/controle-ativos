@@ -840,14 +840,13 @@ public class App extends Application {
 
         stage.show();
 
-
     }
 
     private void exportarExcel() {
 
         new Alert(
                 Alert.AlertType.INFORMATION,
-                "Método exportarExcel() funcionando ✅"
+                "Botão funcionando!"
         ).show();
     }
 

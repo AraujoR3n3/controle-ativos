@@ -392,98 +392,27 @@ public class App extends Application {
 // EVENTO EDITAR
 // ======================================================
 
-        btnEditar.setOnAction(e -> {
-
-            String[] ativo =
-                    tabela.getSelectionModel()
-                            .getSelectedItem();
-
-            if (ativo == null) {
-
-                new Alert(
-                        Alert.AlertType.WARNING,
-                        "Selecione um ativo."
-                ).show();
-
-                return;
-            }
-
-            // índice 4 = patrimônio
-            String patrimonioSelecionado =
-                    ativo[4];
-
-            AtivoDAO dao = new AtivoDAO();
-
-            Ativo ativoSelecionado =
-                    dao.buscarPorPatrimonio(
-                            patrimonioSelecionado
-                    );
-
-            if (ativoSelecionado != null) {
-
-                cbEmpresa.setValue(
-                        ativoSelecionado.getEmpresa()
-                );
-
-                cbUnidade.setValue(
-                        ativoSelecionado.getCd()
-                );
-
-                txtEquipamento.setText(
-                        ativoSelecionado.getEquipamento()
-                );
-
-                txtMarca.setText(
-                        ativoSelecionado.getMarca()
-                );
-
-                txtModelo.setText(
-                        ativoSelecionado.getModelo()
-                );
-
-                txtSerial.setText(
-                        ativoSelecionado.getSerial()
-                );
-
-                txtHost.setText(
-                        ativoSelecionado.getHost()
-                );
-
-                txtPatrimonio.setText(
-                        ativoSelecionado.getPatrimonio()
-                );
-
-                patrimonioOriginal[0] =
-                        ativoSelecionado.getPatrimonio();
-
-                txtLocal.setText(
-                        ativoSelecionado.getLocal()
-                );
-
-                txtResponsavel.setText(
-                        ativoSelecionado.getResponsavel()
-                );
-
-                txtObs.setText(
-                        ativoSelecionado.getObservacoes()
-                );
-
-                cbStatus.setValue(
-                        ativoSelecionado.getStatus()
-                );
-
-                cbCondicao.setValue(
-                        ativoSelecionado.getCondicao()
-                );
-
-                cbSituacao.setValue(
-                        ativoSelecionado.getSituacao()
-                );
-
-                modoEdicao[0] = true;
-            }
-
-        });
+        btnEditar.setOnAction(
+                e -> editarAtivo(
+                        tabela,
+                        cbEmpresa,
+                        cbUnidade,
+                        txtEquipamento,
+                        txtMarca,
+                        txtModelo,
+                        txtSerial,
+                        txtHost,
+                        txtPatrimonio,
+                        txtLocal,
+                        txtResponsavel,
+                        txtObs,
+                        cbStatus,
+                        cbCondicao,
+                        cbSituacao,
+                        modoEdicao,
+                        patrimonioOriginal
+                )
+        );
 
 // ======================================================
 // EVENTO EXCLUIR
@@ -712,7 +641,100 @@ public class App extends Application {
         stage.show();
 
     }
+
+    private void editarAtivo(
+            TableView<String[]> tabela,
+            ComboBox<String> cbEmpresa,
+            ComboBox<String> cbUnidade,
+            TextField txtEquipamento,
+            TextField txtMarca,
+            TextField txtModelo,
+            TextField txtSerial,
+            TextField txtHost,
+            TextField txtPatrimonio,
+            TextField txtLocal,
+            TextField txtResponsavel,
+            TextArea txtObs,
+            ComboBox<String> cbStatus,
+            ComboBox<String> cbCondicao,
+            ComboBox<String> cbSituacao,
+            boolean[] modoEdicao,
+            String[] patrimonioOriginal
+    ) {
+
+        String[] ativo =
+                tabela.getSelectionModel()
+                        .getSelectedItem();
+
+        if (ativo == null) {
+
+            new Alert(
+                    Alert.AlertType.WARNING,
+                    "Selecione um ativo."
+            ).show();
+
+            return;
+        }
+
+        String patrimonioSelecionado =
+                ativo[4];
+
+        try {
+
+            Connection conn = Database.connect();
+
+            PreparedStatement ps =
+                    conn.prepareStatement(
+                            """
+                            SELECT *
+                            FROM ativos
+                            WHERE patrimonio = ?
+                            """
+                    );
+
+            ps.setString(
+                    1,
+                    patrimonioSelecionado
+            );
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            if (rs.next()) {
+
+                cbEmpresa.setValue(rs.getString("empresa"));
+                cbUnidade.setValue(rs.getString("cd"));
+                txtEquipamento.setText(rs.getString("equipamento"));
+                txtMarca.setText(rs.getString("marca"));
+                txtModelo.setText(rs.getString("modelo"));
+                txtSerial.setText(rs.getString("serial"));
+                txtHost.setText(rs.getString("host"));
+                txtPatrimonio.setText(rs.getString("patrimonio"));
+
+                patrimonioOriginal[0] =
+                        rs.getString("patrimonio");
+
+                txtLocal.setText(rs.getString("local"));
+                txtResponsavel.setText(rs.getString("responsavel"));
+                txtObs.setText(rs.getString("observacoes"));
+
+                cbStatus.setValue(rs.getString("status"));
+                cbCondicao.setValue(rs.getString("condicao"));
+                cbSituacao.setValue(rs.getString("situacao"));
+
+                modoEdicao[0] = true;
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+        }
+    }
+
     private void salvarAtivo(
+
             ComboBox<String> cbEmpresa,
             ComboBox<String> cbUnidade,
             TextField txtEquipamento,

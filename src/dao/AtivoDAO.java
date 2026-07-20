@@ -19,6 +19,12 @@ public class AtivoDAO {
             Connection conn = Database.connect();
 
             if (conn == null) {
+                throw new RuntimeException(
+                        "Falha ao conectar ao banco."
+                );
+            }
+
+            if (conn == null) {
                 System.out.println("Erro na conexão ❌");
                 return lista;
             }

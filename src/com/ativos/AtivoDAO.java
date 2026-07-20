@@ -1,14 +1,26 @@
 package com.ativos;
 
-import java.sql.PreparedStatement;
+// ===============================
+// Imports
+// ===============================
+
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.List;
 
+// ===============================
+// DAO de Ativos
+// ===============================
+
 public class AtivoDAO {
 
+    // ===============================
+    // Listar todos os ativos
+    // ===============================
     public List<Ativo> listarTodos() {
 
         List<Ativo> ativos =
@@ -59,11 +71,17 @@ public class AtivoDAO {
         return ativos;
     }
 
+    // ===============================
+    // Contar ativos
+    // ===============================
     public int contarAtivos() {
 
         return listarTodos().size();
     }
 
+    // ===============================
+    // Buscar ativo por patrimônio
+    // ===============================
     public Ativo buscarPorPatrimonio(
             String patrimonio
     ) {
@@ -124,6 +142,9 @@ public class AtivoDAO {
         return null;
     }
 
+    // ===============================
+    // Excluir ativo
+    // ===============================
     public void excluir(
             String patrimonio
     ) {
@@ -156,4 +177,136 @@ public class AtivoDAO {
         }
     }
 
+    // ===============================
+    // Salvar novo ativo
+    // ===============================
+    public void salvar(
+            Ativo ativo
+    ) {
+
+        try {
+
+            Connection conn =
+                    Database.connect();
+
+            PreparedStatement ps =
+                    conn.prepareStatement(
+                            """
+                            INSERT INTO ativos
+                            (
+                                empresa,
+                                cd,
+                                equipamento,
+                                marca,
+                                modelo,
+                                serial,
+                                host,
+                                patrimonio,
+                                local,
+                                status,
+                                condicao,
+                                situacao,
+                                responsavel,
+                                observacoes
+                            )
+                            VALUES
+                            (
+                                ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+                            )
+                            """
+                    );
+
+            ps.setString(1, ativo.getEmpresa());
+            ps.setString(2, ativo.getCd());
+            ps.setString(3, ativo.getEquipamento());
+            ps.setString(4, ativo.getMarca());
+            ps.setString(5, ativo.getModelo());
+            ps.setString(6, ativo.getSerial());
+            ps.setString(7, ativo.getHost());
+            ps.setString(8, ativo.getPatrimonio());
+            ps.setString(9, ativo.getLocal());
+            ps.setString(10, ativo.getStatus());
+            ps.setString(11, ativo.getCondicao());
+            ps.setString(12, ativo.getSituacao());
+            ps.setString(13, ativo.getResponsavel());
+            ps.setString(14, ativo.getObservacoes());
+
+            ps.executeUpdate();
+
+            conn.close();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+        }
+    }
+    // ===============================
+// Atualizar ativo
+// ===============================
+    public void atualizar(
+            Ativo ativo,
+            String patrimonioOriginal
+    ) {
+
+        try {
+
+            Connection conn =
+                    Database.connect();
+
+            if (conn == null) {
+                return;
+            }
+
+            PreparedStatement ps =
+                    conn.prepareStatement(
+                            """
+                            UPDATE ativos
+                            SET
+                                empresa = ?,
+                                cd = ?,
+                                equipamento = ?,
+                                marca = ?,
+                                modelo = ?,
+                                serial = ?,
+                                host = ?,
+                                patrimonio = ?,
+                                local = ?,
+                                status = ?,
+                                condicao = ?,
+                                situacao = ?,
+                                responsavel = ?,
+                                observacoes = ?
+                            WHERE patrimonio = ?
+                            """
+                    );
+
+            ps.setString(1, ativo.getEmpresa());
+            ps.setString(2, ativo.getCd());
+            ps.setString(3, ativo.getEquipamento());
+            ps.setString(4, ativo.getMarca());
+            ps.setString(5, ativo.getModelo());
+            ps.setString(6, ativo.getSerial());
+            ps.setString(7, ativo.getHost());
+            ps.setString(8, ativo.getPatrimonio());
+            ps.setString(9, ativo.getLocal());
+            ps.setString(10, ativo.getStatus());
+            ps.setString(11, ativo.getCondicao());
+            ps.setString(12, ativo.getSituacao());
+            ps.setString(13, ativo.getResponsavel());
+            ps.setString(14, ativo.getObservacoes());
+
+            ps.setString(
+                    15,
+                    patrimonioOriginal
+            );
+
+            ps.executeUpdate();
+
+            conn.close();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+        }
+    }
 }

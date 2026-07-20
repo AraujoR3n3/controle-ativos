@@ -844,10 +844,295 @@ public class App extends Application {
 
     private void exportarExcel() {
 
-        new Alert(
-                Alert.AlertType.INFORMATION,
-                "Botão funcionando!"
-        ).show();
+        try {
+
+            Workbook workbook =
+                    new XSSFWorkbook();
+
+            String dataHora =
+                    LocalDateTime.now()
+                            .format(
+                                    DateTimeFormatter.ofPattern(
+                                            "dd/MM/yyyy HH:mm:ss"
+                                    )
+                            );
+            Sheet abaAtivos =
+                    workbook.createSheet(
+                            "Ativos"
+                    );
+            Sheet abaResumo =
+                    workbook.createSheet(
+                            "Resumo"
+                    );
+
+            Row r0 =
+                    abaResumo.createRow(0);
+
+            r0.createCell(0)
+                    .setCellValue(
+                            "SISTEMA DE GESTÃO DE ATIVOS"
+                    );
+
+            Row r2 =
+                    abaResumo.createRow(2);
+
+            r2.createCell(0)
+                    .setCellValue(
+                            "Gerado em:"
+                    );
+
+            r2.createCell(1)
+                    .setCellValue(
+                            dataHora
+                    );
+
+            Row cabecalho =
+                    abaAtivos.createRow(0);
+
+            cabecalho.createCell(0)
+                    .setCellValue("Empresa");
+
+            cabecalho.createCell(1)
+                    .setCellValue("CD");
+
+            cabecalho.createCell(2)
+                    .setCellValue("Equipamento");
+
+            cabecalho.createCell(3)
+                    .setCellValue("Marca");
+
+            cabecalho.createCell(4)
+                    .setCellValue("Modelo");
+
+            cabecalho.createCell(5)
+                    .setCellValue("Serial");
+
+            cabecalho.createCell(6)
+                    .setCellValue("Host");
+
+            cabecalho.createCell(7)
+                    .setCellValue("Patrimônio");
+
+            cabecalho.createCell(8)
+                    .setCellValue("Local");
+
+            cabecalho.createCell(9)
+                    .setCellValue("Status");
+
+            cabecalho.createCell(10)
+                    .setCellValue("Condição");
+
+            cabecalho.createCell(11)
+                    .setCellValue("Situação");
+
+            cabecalho.createCell(12)
+                    .setCellValue("Responsável");
+
+            cabecalho.createCell(13)
+                    .setCellValue("Observações");
+
+
+            Connection conn = Database.connect();
+
+            Statement resumoStmt =
+                    conn.createStatement();
+
+
+            Statement stmt =
+                    conn.createStatement();
+
+            ResultSet rsResumo =
+                    resumoStmt.executeQuery(
+                            "SELECT COUNT(*) total FROM ativos"
+                    );
+
+            if (rsResumo.next()) {
+
+                Row r5 =
+                        abaResumo.createRow(5);
+
+                r5.createCell(0)
+                        .setCellValue(
+                                "Total de Ativos"
+                        );
+
+                r5.createCell(1)
+                        .setCellValue(
+                                rsResumo.getInt("total")
+                        );
+            }
+
+            rsResumo =
+                    resumoStmt.executeQuery(
+                            "SELECT COUNT(*) total FROM empresas"
+                    );
+
+            if (rsResumo.next()) {
+
+                Row r6 =
+                        abaResumo.createRow(6);
+
+                r6.createCell(0)
+                        .setCellValue(
+                                "Total de Empresas"
+                        );
+
+                r6.createCell(1)
+                        .setCellValue(
+                                rsResumo.getInt("total")
+                        );
+                rsResumo =
+                        resumoStmt.executeQuery(
+                                "SELECT COUNT(*) total FROM unidades"
+                        );
+
+                if (rsResumo.next()) {
+
+                    Row r7 =
+                            abaResumo.createRow(7);
+
+                    r7.createCell(0)
+                            .setCellValue(
+                                    "Total de Localidades"
+                            );
+
+                    r7.createCell(1)
+                            .setCellValue(
+                                    rsResumo.getInt("total")
+                            );
+                }
+
+            }
+
+            ResultSet rs =
+                    stmt.executeQuery(
+                            "SELECT * FROM ativos"
+                    );
+
+            int linhaExcel = 1;
+
+            while (rs.next()) {
+
+                Row linha =
+                        abaAtivos.createRow(
+                                linhaExcel++
+                        );
+
+                linha.createCell(0)
+                        .setCellValue(
+                                rs.getString("empresa")
+                        );
+
+                linha.createCell(1)
+                        .setCellValue(
+                                rs.getString("cd")
+                        );
+
+                linha.createCell(2)
+                        .setCellValue(
+                                rs.getString("equipamento")
+                        );
+
+                linha.createCell(3)
+                        .setCellValue(
+                                rs.getString("marca")
+                        );
+
+                linha.createCell(4)
+                        .setCellValue(
+                                rs.getString("modelo")
+                        );
+
+                linha.createCell(5)
+                        .setCellValue(
+                                rs.getString("serial")
+                        );
+
+                linha.createCell(6)
+                        .setCellValue(
+                                rs.getString("host")
+                        );
+
+                linha.createCell(7)
+                        .setCellValue(
+                                rs.getString("patrimonio")
+                        );
+
+                linha.createCell(8)
+                        .setCellValue(
+                                rs.getString("local")
+                        );
+
+                linha.createCell(9)
+                        .setCellValue(
+                                rs.getString("status")
+                        );
+
+                linha.createCell(10)
+                        .setCellValue(
+                                rs.getString("condicao")
+                        );
+
+                linha.createCell(11)
+                        .setCellValue(
+                                rs.getString("situacao")
+                        );
+
+                linha.createCell(12)
+                        .setCellValue(
+                                rs.getString("responsavel")
+                        );
+
+                linha.createCell(13)
+                        .setCellValue(
+                                rs.getString("observacoes")
+                        );
+            }
+
+            for (int i = 0; i < 14; i++) {
+
+                abaAtivos.autoSizeColumn(i);
+            }
+
+            String nomeArquivo =
+                    "Inventario_Ativos_"
+                            + LocalDateTime.now()
+                            .format(
+                                    DateTimeFormatter.ofPattern(
+                                            "yyyy-MM-dd_HHmmss"
+                                    )
+                            )
+                            + ".xlsx";
+
+            FileOutputStream arquivo =
+                    new FileOutputStream(
+                            nomeArquivo
+                    );
+
+            abaResumo.autoSizeColumn(0);
+            abaResumo.autoSizeColumn(1);
+
+            workbook.write(arquivo);
+
+            arquivo.close();
+
+            workbook.close();
+
+            conn.close();
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Arquivo Ativos.xlsx criado ✅"
+            ).show();
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    ex.getMessage()
+            ).showAndWait();
+        }
     }
 
     private void limparFormulario(

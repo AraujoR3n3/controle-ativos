@@ -1122,8 +1122,9 @@ public class App extends Application {
 
             new Alert(
                     Alert.AlertType.INFORMATION,
-                    "Arquivo Ativos.xlsx criado ✅"
+                    "Arquivo criado: " + nomeArquivo + " ✅"
             ).show();
+
         } catch (Exception ex) {
 
             ex.printStackTrace();

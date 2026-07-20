@@ -734,7 +734,228 @@ public class App extends Application {
             String[] patrimonioOriginal
     ) {
 
-        System.out.println("salvarAtivo() chamado");
+
+        try {
+
+            Connection conn = Database.connect();
+            if (cbUnidade.getValue() == null ||
+                    txtEquipamento.getText().trim().isEmpty() ||
+                    txtSerial.getText().trim().isEmpty() ||
+                    txtPatrimonio.getText().trim().isEmpty()) {
+
+                new Alert(
+                        Alert.AlertType.WARNING,
+                        """
+                                Preencha os campos obrigatórios:
+                                
+                                • CD
+                                • Equipamento
+                                • Serial
+                                • Patrimônio
+                                """
+                ).show();
+
+                return;
+            }
+
+            if (conn == null) {
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Erro na conexão com banco ❌"
+                ).show();
+
+                return;
+            }
+
+            if (modoEdicao[0]) {
+
+                String sql =
+                        """
+                               
+                                UPDATE ativos
+                                                    SET
+                                                        empresa = ?,
+                                                        cd = ?,
+                                                        equipamento = ?,
+                                                        marca = ?,
+                                                        modelo = ?,
+                                                        serial = ?,
+                                                        host = ?,
+                                                        patrimonio = ?,
+                                                        local = ?,
+                                                        status = ?,
+                                                        condicao = ?,
+                                                        situacao = ?,
+                                                        observacoes = ?,
+                                                        responsavel = ?
+                                                    WHERE patrimonio = ?
+                                """;
+
+                PreparedStatement stmt =
+                        conn.prepareStatement(sql);
+
+                stmt.setString(1, cbEmpresa.getValue());
+
+                stmt.setString(2, cbUnidade.getValue());
+
+                stmt.setString(3, txtEquipamento.getText());
+
+                stmt.setString(4, txtMarca.getText());
+
+                stmt.setString(5, txtModelo.getText());
+
+                stmt.setString(6, txtSerial.getText());
+
+                stmt.setString(7, txtHost.getText());
+
+                stmt.setString(8, txtPatrimonio.getText()); // NOVO
+
+                stmt.setString(9, txtLocal.getText());
+
+                stmt.setString(
+                        10,
+                        cbStatus.getValue() == null ? "" : cbStatus.getValue()
+                );
+
+                stmt.setString(
+                        11,
+                        cbCondicao.getValue() == null ? "" : cbCondicao.getValue()
+                );
+
+                stmt.setString(
+                        12,
+                        cbSituacao.getValue() == null ? "" : cbSituacao.getValue()
+                );
+
+                stmt.setString(13, txtObs.getText());
+
+                stmt.setString(14, txtResponsavel.getText());
+
+                stmt.setString(15, patrimonioOriginal[0]);
+
+                int linhasAfetadas =
+                        stmt.executeUpdate();
+
+                modoEdicao[0] = false;
+
+                conn.close();
+
+                carregarTabela(
+                        tabela,
+                        cbFiltroUnidade,
+                        lblTotal
+                );
+                new Alert(
+                        Alert.AlertType.INFORMATION,
+                        "Registro atualizado com sucesso ✅"
+                ).show();
+
+                return;
+            }
+
+            String checkSql =
+                    "SELECT COUNT(*) FROM ativos WHERE patrimonio = ? OR serial = ?";
+
+            PreparedStatement checkStmt =
+                    conn.prepareStatement(checkSql);
+
+            checkStmt.setString(1, txtPatrimonio.getText().trim());
+            checkStmt.setString(2, txtSerial.getText().trim());
+
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Serial ou patrimônio já cadastrado ❌"
+                ).show();
+
+                conn.close();
+                return;
+            }
+
+            String sql =
+                    """
+                            INSERT INTO ativos
+                                                                          (
+                                                                              empresa,
+                                                                              cd,
+                                                                              equipamento,
+                                                                              marca,
+                                                                              modelo,
+                                                                              serial,
+                                                                              host,
+                                                                              patrimonio,
+                                                                              local,
+                                                                              status,
+                                                                              condicao,
+                                                                              situacao,
+                                                                              observacoes,
+                                                                              responsavel
+                                                                          )
+                                                                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """;
+
+            PreparedStatement stmt =
+                    conn.prepareStatement(sql);
+
+            stmt.setString(1, cbEmpresa.getValue());
+            stmt.setString(2, cbUnidade.getValue());
+            stmt.setString(3, txtEquipamento.getText());
+            stmt.setString(4, txtMarca.getText());
+            stmt.setString(5, txtModelo.getText());
+            stmt.setString(6, txtSerial.getText());
+            stmt.setString(7, txtHost.getText());
+            stmt.setString(8, txtPatrimonio.getText());
+            stmt.setString(9, txtLocal.getText());
+            stmt.setString(10, cbStatus.getValue());
+            stmt.setString(11, cbCondicao.getValue());
+            stmt.setString(12, cbSituacao.getValue());
+            stmt.setString(13, txtObs.getText());
+            stmt.setString(14, txtResponsavel.getText());
+
+            int linhasAfetadas =
+                    stmt.executeUpdate();
+
+            conn.close();
+
+            carregarTabela(
+                    tabela,
+                    cbFiltroUnidade,
+                    lblTotal
+            );
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Ativo salvo com sucesso ✅"
+            ).show();
+            limparFormulario(
+                    cbUnidade,
+                    txtEquipamento,
+                    txtMarca,
+                    txtModelo,
+                    txtSerial,
+                    txtPatrimonio,
+                    txtHost,
+                    txtLocal,
+                    txtResponsavel,
+                    txtObs,
+                    cbStatus,
+                    cbCondicao,
+                    cbSituacao
+            );
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Erro ao salvar ❌"
+            ).show();
+        }
     }
 
     private void exportarExcel() {

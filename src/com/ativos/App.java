@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import com.ativos.view.DashboardView;
 import com.ativos.view.EmpresaView;
 import com.ativos.view.LocalidadeView;
+import com.ativos.controller.AtivoController;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,7 +32,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class App extends Application {
-
+    private AtivoController controller =
+            new AtivoController();
     @Override
     public void start(Stage stage) {
 
@@ -393,7 +395,7 @@ public class App extends Application {
 // ======================================================
 
         btnEditar.setOnAction(
-                e -> editarAtivo(
+                e -> controller.editarAtivo(
                         tabela,
                         cbEmpresa,
                         cbUnidade,
@@ -418,7 +420,7 @@ public class App extends Application {
 // EVENTO EXCLUIR
 // ======================================================
         btnExcluir.setOnAction(
-                e -> excluirAtivo(
+                e -> controller.excluirAtivo(
                         tabela,
                         cbFiltroUnidade,
                         lblTotal

@@ -1,4 +1,6 @@
-package com.ativos;
+package dao;
+
+import com.ativos.Database;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.ativos.view;
 
 import com.ativos.Database;
-import com.ativos.EmpresaDAO;
+import dao.EmpresaDAO;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;

@@ -1,5 +1,6 @@
 package com.ativos;
 
+import dao.EmpresaDAO;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 

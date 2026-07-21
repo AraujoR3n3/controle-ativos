@@ -2,6 +2,7 @@ package com.ativos.controller;
 
 import com.ativos.AtivoDAO;
 import com.ativos.Database;
+import com.ativos.util.FormularioUtil;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,6 +18,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class AtivoController {
+
+    // ======================================================
+    // CONTROLLER DE ATIVOS
+    // ======================================================
+
+
 
     // ======================================================
     // EXCLUIR ATIVO
@@ -78,12 +85,12 @@ public class AtivoController {
                     patrimonioSelecionado
             );
 
-            // TODO:
-            // Recarregar tabela após a exclusão
-            // Atualmente esse método ainda está no App.java
+            // Atualiza tabela após exclusão
 
-            System.out.println(
-                    "Tabela deve ser recarregada aqui"
+            carregarTabela(
+                    tabela,
+                    cbFiltroUnidade,
+                    lblTotal
             );
 
             new Alert(
@@ -247,6 +254,7 @@ public class AtivoController {
             ).show();
         }
     }
+
 // ======================================================
 // SALVAR ATIVO
 // ======================================================
@@ -273,12 +281,247 @@ public class AtivoController {
             String[] patrimonioOriginal
     ) {
 
-        System.out.println(
-                "Controller: salvarAtivo()"
-        );
+        try {
+
+            Connection conn = Database.connect();
+
+            if (cbUnidade.getValue() == null ||
+                    txtEquipamento.getText().trim().isEmpty() ||
+                    txtSerial.getText().trim().isEmpty() ||
+                    txtPatrimonio.getText().trim().isEmpty()) {
+
+                new Alert(
+                        Alert.AlertType.WARNING,
+                        """
+                        Preencha os campos obrigatórios:
+    
+                        • CD
+                        • Equipamento
+                        • Serial
+                        • Patrimônio
+                        """
+                ).show();
+
+                return;
+            }
+
+            if (conn == null) {
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Erro na conexão com banco ❌"
+                ).show();
+
+                return;
+            }
+
+            // ======================================
+            // UPDATE
+            // ======================================
+
+            if (modoEdicao[0]) {
+
+                String sql =
+                        """
+                        UPDATE ativos
+                        SET
+                            empresa = ?,
+                            cd = ?,
+                            equipamento = ?,
+                            marca = ?,
+                            modelo = ?,
+                            serial = ?,
+                            host = ?,
+                            patrimonio = ?,
+                            local = ?,
+                            status = ?,
+                            condicao = ?,
+                            situacao = ?,
+                            observacoes = ?,
+                            responsavel = ?
+                        WHERE patrimonio = ?
+                        """;
+
+                PreparedStatement stmt =
+                        conn.prepareStatement(sql);
+
+                stmt.setString(1, cbEmpresa.getValue());
+                stmt.setString(2, cbUnidade.getValue());
+                stmt.setString(3, txtEquipamento.getText());
+                stmt.setString(4, txtMarca.getText());
+                stmt.setString(5, txtModelo.getText());
+                stmt.setString(6, txtSerial.getText());
+                stmt.setString(7, txtHost.getText());
+                stmt.setString(8, txtPatrimonio.getText());
+                stmt.setString(9, txtLocal.getText());
+
+                stmt.setString(
+                        10,
+                        cbStatus.getValue() == null
+                                ? ""
+                                : cbStatus.getValue()
+                );
+
+                stmt.setString(
+                        11,
+                        cbCondicao.getValue() == null
+                                ? ""
+                                : cbCondicao.getValue()
+                );
+
+                stmt.setString(
+                        12,
+                        cbSituacao.getValue() == null
+                                ? ""
+                                : cbSituacao.getValue()
+                );
+
+                stmt.setString(13, txtObs.getText());
+                stmt.setString(14, txtResponsavel.getText());
+                stmt.setString(15, patrimonioOriginal[0]);
+
+                stmt.executeUpdate();
+
+                modoEdicao[0] = false;
+
+                conn.close();
+
+                carregarTabela(
+                        tabela,
+                        cbFiltroUnidade,
+                        lblTotal
+                );
+
+                new Alert(
+                        Alert.AlertType.INFORMATION,
+                        "Registro atualizado com sucesso ✅"
+                ).show();
+
+                return;
+            }
+
+            // ======================================
+            // VALIDA DUPLICIDADE
+            // ======================================
+
+            String checkSql =
+                    "SELECT COUNT(*) FROM ativos WHERE patrimonio = ? OR serial = ?";
+
+            PreparedStatement checkStmt =
+                    conn.prepareStatement(checkSql);
+
+            checkStmt.setString(
+                    1,
+                    txtPatrimonio.getText().trim()
+            );
+
+            checkStmt.setString(
+                    2,
+                    txtSerial.getText().trim()
+            );
+
+            ResultSet rs =
+                    checkStmt.executeQuery();
+
+            if (rs.next() && rs.getInt(1) > 0) {
+
+                new Alert(
+                        Alert.AlertType.ERROR,
+                        "Serial ou patrimônio já cadastrado ❌"
+                ).show();
+
+                conn.close();
+
+                return;
+            }
+
+            // ======================================
+            // INSERT
+            // ======================================
+
+            String sql =
+                    """
+                    INSERT INTO ativos
+                    (
+                        empresa,
+                        cd,
+                        equipamento,
+                        marca,
+                        modelo,
+                        serial,
+                        host,
+                        patrimonio,
+                        local,
+                        status,
+                        condicao,
+                        situacao,
+                        observacoes,
+                        responsavel
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """;
+
+            PreparedStatement stmt =
+                    conn.prepareStatement(sql);
+
+            stmt.setString(1, cbEmpresa.getValue());
+            stmt.setString(2, cbUnidade.getValue());
+            stmt.setString(3, txtEquipamento.getText());
+            stmt.setString(4, txtMarca.getText());
+            stmt.setString(5, txtModelo.getText());
+            stmt.setString(6, txtSerial.getText());
+            stmt.setString(7, txtHost.getText());
+            stmt.setString(8, txtPatrimonio.getText());
+            stmt.setString(9, txtLocal.getText());
+            stmt.setString(10, cbStatus.getValue());
+            stmt.setString(11, cbCondicao.getValue());
+            stmt.setString(12, cbSituacao.getValue());
+            stmt.setString(13, txtObs.getText());
+            stmt.setString(14, txtResponsavel.getText());
+
+            stmt.executeUpdate();
+
+            conn.close();
+
+            carregarTabela(
+                    tabela,
+                    cbFiltroUnidade,
+                    lblTotal
+            );
+
+            new Alert(
+                    Alert.AlertType.INFORMATION,
+                    "Ativo salvo com sucesso ✅"
+            ).show();
+
+            FormularioUtil.limparFormulario(
+                    cbUnidade,
+                    txtEquipamento,
+                    txtMarca,
+                    txtModelo,
+                    txtSerial,
+                    txtPatrimonio,
+                    txtHost,
+                    txtLocal,
+                    txtResponsavel,
+                    txtObs,
+                    cbStatus,
+                    cbCondicao,
+                    cbSituacao
+            );
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Erro ao salvar ❌"
+            ).show();
+        }
     }
 
-    // ======================================================
+// ======================================================
 // CARREGAR TABELA
 // ======================================================
 

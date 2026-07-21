@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class AtivoController {
 
@@ -275,6 +276,131 @@ public class AtivoController {
         System.out.println(
                 "Controller: salvarAtivo()"
         );
+    }
+
+    // ======================================================
+// CARREGAR TABELA
+// ======================================================
+
+    public void carregarTabela(
+            TableView<String[]> tabela,
+            ComboBox<String> cbFiltroUnidade,
+            Label lblTotal
+    ) {
+
+        // Limpa tabela antes de carregar
+
+        tabela.getItems().clear();
+
+        try {
+
+            Connection conn =
+                    Database.connect();
+
+            // ======================================
+            // EXIBE TODOS OS REGISTROS
+            // ======================================
+
+            if ("Todos".equals(
+                    cbFiltroUnidade.getValue()
+            )) {
+
+                Statement stmt =
+                        conn.createStatement();
+
+                ResultSet rs =
+                        stmt.executeQuery(
+                                """
+                                SELECT
+                                    empresa,
+                                    cd,
+                                    equipamento,
+                                    host,
+                                    patrimonio,
+                                    local,
+                                    responsavel
+                                FROM ativos
+                                ORDER BY cd
+                                """
+                        );
+
+                while (rs.next()) {
+
+                    tabela.getItems().add(
+                            new String[]{
+                                    rs.getString("empresa"),
+                                    rs.getString("cd"),
+                                    rs.getString("equipamento"),
+                                    rs.getString("host"),
+                                    rs.getString("patrimonio"),
+                                    rs.getString("local"),
+                                    rs.getString("responsavel")
+                            }
+                    );
+                }
+
+            }
+
+            // ======================================
+            // EXIBE APENAS O CD SELECIONADO
+            // ======================================
+
+            else {
+
+                PreparedStatement ps =
+                        conn.prepareStatement(
+                                """
+                                SELECT
+                                    empresa,
+                                    cd,
+                                    equipamento,
+                                    host,
+                                    patrimonio,
+                                    local,
+                                    responsavel
+                                FROM ativos
+                                WHERE cd = ?
+                                ORDER BY cd
+                                """
+                        );
+
+                ps.setString(
+                        1,
+                        cbFiltroUnidade.getValue()
+                );
+
+                ResultSet rs =
+                        ps.executeQuery();
+
+                while (rs.next()) {
+
+                    tabela.getItems().add(
+                            new String[]{
+                                    rs.getString("empresa"),
+                                    rs.getString("cd"),
+                                    rs.getString("equipamento"),
+                                    rs.getString("host"),
+                                    rs.getString("patrimonio"),
+                                    rs.getString("local"),
+                                    rs.getString("responsavel")
+                            }
+                    );
+                }
+            }
+
+            // Atualiza contador
+
+            lblTotal.setText(
+                    "Total de Ativos: "
+                            + tabela.getItems().size()
+            );
+
+            conn.close();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+        }
     }
 
 }

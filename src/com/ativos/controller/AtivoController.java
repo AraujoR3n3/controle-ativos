@@ -246,4 +246,36 @@ public class AtivoController {
             ).show();
         }
     }
+
+    // ======================================================
+// SALVAR ATIVO
+// ======================================================
+
+    public void salvarAtivo(
+            ComboBox<String> cbEmpresa,
+            ComboBox<String> cbUnidade,
+            TextField txtEquipamento,
+            TextField txtMarca,
+            TextField txtModelo,
+            TextField txtSerial,
+            TextField txtHost,
+            TextField txtPatrimonio,
+            TextField txtLocal,
+            TextField txtResponsavel,
+            TextArea txtObs,
+            ComboBox<String> cbStatus,
+            ComboBox<String> cbCondicao,
+            ComboBox<String> cbSituacao,
+            TableView<String[]> tabela,
+            ComboBox<String> cbFiltroUnidade,
+            Label lblTotal,
+            boolean[] modoEdicao,
+            String[] patrimonioOriginal
+    ) {
+
+        System.out.println(
+                "Controller: salvarAtivo()"
+        );
+    }
+
 }

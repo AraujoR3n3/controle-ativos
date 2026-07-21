@@ -452,7 +452,7 @@ public class App extends Application {
 // ======================================================
 
         btnSalvar.setOnAction(
-                e -> salvarAtivo(
+                e -> controller.salvarAtivo(
                         cbEmpresa,
                         cbUnidade,
                         txtEquipamento,
@@ -474,6 +474,7 @@ public class App extends Application {
                         patrimonioOriginal
                 )
         );
+
 // ======================================================
 // EXPORTAÇÃO EXCEL
 // ======================================================

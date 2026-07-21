@@ -23,6 +23,7 @@ import com.ativos.view.DashboardView;
 import com.ativos.view.EmpresaView;
 import com.ativos.view.LocalidadeView;
 import com.ativos.controller.AtivoController;
+import com.ativos.util.FormularioUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -453,7 +454,7 @@ public class App extends Application {
 // ======================================================
 
         btnSalvar.setOnAction(
-                e -> controller.salvarAtivo(
+                e -> salvarAtivo(
                         cbEmpresa,
                         cbUnidade,
                         txtEquipamento,
@@ -976,7 +977,7 @@ public class App extends Application {
                     Alert.AlertType.INFORMATION,
                     "Ativo salvo com sucesso ✅"
             ).show();
-            limparFormulario(
+            FormularioUtil.limparFormulario(
                     cbUnidade,
                     txtEquipamento,
                     txtMarca,
@@ -991,6 +992,7 @@ public class App extends Application {
                     cbCondicao,
                     cbSituacao
             );
+
 
         } catch (Exception ex) {
 

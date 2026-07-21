@@ -1,4 +1,6 @@
 ### IntelliJ IDEA ###
+.idea/
+*.iml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
@@ -28,3 +30,22 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Build ###
+target/
+build/
+
+### Arquivos compactados ###
+*.zip
+*.rar
+*.7z
+
+### Logs ###
+*.log
+
+### Banco de dados temporários ###
+* - Copia.db
+
+### Arquivos temporários ###
+*.tmp
+*.bak

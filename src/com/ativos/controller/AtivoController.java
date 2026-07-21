@@ -645,5 +645,111 @@ public class AtivoController {
             ex.printStackTrace();
         }
     }
+// ======================================================
+// BUSCAR ATIVOS
+// ======================================================
 
+    public void buscarAtivos(
+            TableView<String[]> tabela,
+            ComboBox<String> cbEmpresa,
+            ComboBox<String> cbUnidade,
+            TextField txtBusca
+    ) {
+
+        // Limpa resultados anteriores
+
+        if (cbEmpresa.getValue() == null ||
+                cbUnidade.getValue() == null) {
+            return;
+        }
+
+        tabela.getItems().clear();
+        try {
+
+            Connection conn =
+                    Database.connect();
+
+            System.out.println(
+                    "Empresa: " + cbEmpresa.getValue()
+            );
+
+            System.out.println(
+                    "Local: " + cbUnidade.getValue()
+            );
+
+            System.out.println(
+                    "Busca: " + txtBusca.getText()
+            );
+
+            PreparedStatement ps =
+                    conn.prepareStatement(
+                            """
+                            SELECT
+                                empresa,
+                                cd,
+                                equipamento,
+                                host,
+                                patrimonio,
+                                local,
+                                responsavel
+                            FROM ativos
+                            WHERE empresa = ?
+                            AND cd = ?
+                              AND (
+                                    patrimonio LIKE ?
+                                 OR host LIKE ?
+                                 OR responsavel LIKE ?
+                                 OR equipamento LIKE ?
+                              )
+                            ORDER BY cd
+                            """
+                    );
+
+            String busca =
+                    "%" + txtBusca.getText().trim() + "%";
+
+            String empresa =
+                    cbEmpresa.getValue();
+
+            String local =
+                    cbUnidade.getValue();
+
+            ps.setString(1, empresa);
+            ps.setString(2, local);
+
+            ps.setString(3, busca);
+            ps.setString(4, busca);
+            ps.setString(5, busca);
+            ps.setString(6, busca);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while (rs.next()) {
+
+                tabela.getItems().add(
+                        new String[]{
+                                rs.getString("empresa"),
+                                rs.getString("cd"),
+                                rs.getString("equipamento"),
+                                rs.getString("host"),
+                                rs.getString("patrimonio"),
+                                rs.getString("local"),
+                                rs.getString("responsavel")
+                        }
+                );
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            new Alert(
+                    Alert.AlertType.ERROR,
+                    "Erro ao pesquisar ativos ❌"
+            ).show();
+        }
+    }
 }

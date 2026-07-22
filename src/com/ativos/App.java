@@ -46,12 +46,11 @@ public class App extends Application {
 // ======================================================
 // TELA PRINCIPAL
 // ======================================================
-
         Label titulo =
-                new Label("Sistema de Gestão de Ativos");
+                new Label("🖥 Controle de Ativos");
 
         titulo.setStyle(
-                "-fx-font-size:28px;" +
+                "-fx-font-size:20px;" +
                         "-fx-font-weight:bold;"
         );
         titulo.setMaxWidth(Double.MAX_VALUE);
@@ -288,7 +287,7 @@ public class App extends Application {
 // ======================================================
 
         TableView<String[]> tabela = new TableView<>();
-        tabela.setPrefHeight(500);
+        txtObs.setPrefHeight(80);
         TableColumn<String[], String> colEmpresa =
                 new TableColumn<>("Empresa");
 
@@ -527,6 +526,32 @@ public class App extends Application {
                 cbCondicao,
                 cbSituacao
         );
+
+// ======================================================
+// CARD DADOS DO ATIVO
+// ======================================================
+
+        Label lblCadastro =
+                new Label("📝 Dados do Ativo");
+
+        lblCadastro.getStyleClass()
+                .add("card-title");
+
+        VBox cardCadastro =
+                new VBox(
+                        10,
+                        lblCadastro,
+                        linhaEquipamento,
+                        linhaSerial,
+                        linhaPatrimonio,
+                        linhaStatus,
+                        txtResponsavel,
+                        txtObs
+                );
+
+        cardCadastro.getStyleClass()
+                .add("card");
+
         cbEmpresa.setMaxWidth(Double.MAX_VALUE);
         cbUnidade.setMaxWidth(Double.MAX_VALUE);
 
@@ -548,6 +573,27 @@ public class App extends Application {
 
         linhaBusca.setAlignment(Pos.CENTER);
 
+// ======================================================
+// CARD PESQUISA
+// ======================================================
+
+        Label lblPesquisa =
+                new Label("🔍 Pesquisa");
+
+        lblPesquisa.getStyleClass()
+                .add("card-title");
+
+        VBox cardPesquisa =
+                new VBox(
+                        10,
+                        lblPesquisa,
+                        linhaEmpresaUnidade,
+                        linhaBusca
+                );
+
+        cardPesquisa.getStyleClass()
+                .add("card");
+
         HBox linhaBotoes = new HBox(
                 10,
                 btnSalvar,
@@ -558,9 +604,29 @@ public class App extends Application {
                 btnDashboard,
                 btnExportar
         );
+// ======================================================
+// CARD AÇÕES
+// ======================================================
+
+        Label lblAcoes =
+                new Label("⚡ Ações");
+
+        lblAcoes.getStyleClass()
+                .add("card-title");
+
+        VBox cardAcoes =
+                new VBox(
+                        10,
+                        lblAcoes,
+                        linhaBotoes
+                );
+
+        cardAcoes.getStyleClass()
+                .add("card");
+
         linhaBotoes.setAlignment(Pos.CENTER_LEFT);
 
-        VBox layout = new VBox(6);
+        VBox layout = new VBox(10);
         HBox linhaFiltro = new HBox(
                 20,
                 lblFiltro,
@@ -568,38 +634,48 @@ public class App extends Application {
                 lblTotal
         );
 
+// ======================================================
+// CARD INVENTÁRIO
+// ======================================================
+
+        Label lblInventario =
+                new Label("📊 Inventário");
+
+        lblInventario.getStyleClass()
+                .add("card-title");
+
+        VBox cardInventario =
+                new VBox(
+                        10,
+                        lblInventario,
+                        linhaFiltro,
+                        tabela
+                );
+
+        cardInventario.getStyleClass()
+                .add("card");
+
         layout.setPadding(new Insets(20));
 
-        layout.getChildren().addAll(
-
-                titulo,
-
-                linhaEmpresaUnidade,
-
-                linhaBusca,
-
-                linhaEquipamento,
-
-                linhaSerial,
-
-                linhaPatrimonio,
-
-                linhaStatus,
-
-                txtResponsavel,
-
-                txtObs,
-
-                linhaBotoes,
-
-                linhaFiltro,
-
-                tabela
+        VBox.setVgrow(
+                tabela,
+                Priority.ALWAYS
         );
 
-        Scene scene = new Scene(layout, 1000, 600);
-        System.out.println(
-                getClass().getResource("/css/app.css")
+        layout.getChildren().addAll(
+                titulo,
+                cardPesquisa,
+                cardCadastro,
+                cardAcoes,
+                cardInventario
+        );
+
+        Scene scene = new Scene(layout, 1080, 650);
+
+        scene.getStylesheets().add(
+                getClass()
+                        .getResource("/com/ativos/css/app.css")
+                        .toExternalForm()
         );
 
         stage.setTitle("Controle de Ativos");

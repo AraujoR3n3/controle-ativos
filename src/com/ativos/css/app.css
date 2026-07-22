@@ -1,0 +1,125 @@
+/* ======================================================
+   APP
+   ====================================================== */
+
+.root {
+    -fx-background-color: #F4F6F9;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ======================================================
+   TÍTULOS
+   ====================================================== */
+
+.label {
+    -fx-text-fill: #1E293B;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* ======================================================
+   CARDS
+   ====================================================== */
+
+    .card {
+        -fx-background-color: white;
+
+
+        -fx-background-radius: 12;
+    -fx-border-radius: 12;
+
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1;
+
+    -fx-padding: 15;
+
+    -fx-effect: dropshadow(
+        gaussian,
+        rgba(0,0,0,0.08),
+        10,
+        0,
+        0,
+        2
+    );
+}
+
+/* ======================================================
+   BOTÕES
+   ====================================================== */
+
+.button {
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-opacity: 0.90;
+}
+
+/* ======================================================
+   CAMPOS
+   ====================================================== */
+
+.text-field,
+.combo-box,
+.text-area {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1;
+
+    -fx-font-size: 14px;
+}
+
+.text-field:focused,
+.combo-box:focused,
+.text-area:focused {
+    -fx-border-color: #1976D2;
+}
+
+/* ======================================================
+   TABELA
+   ====================================================== */
+
+.table-view {
+    -fx-background-color: white;
+
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+
+    -fx-border-color: #DADADA;
+}
+
+.table-view .column-header {
+    -fx-background-color: #1E293B;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #D6E9FF;
+}
+
+/* ======================================================
+   SCROLL
+   ====================================================== */
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}

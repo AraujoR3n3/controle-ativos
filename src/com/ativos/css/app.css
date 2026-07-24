@@ -24,11 +24,11 @@
    CARDS
    ====================================================== */
 
-    .card {
-        -fx-background-color: white;
+.card {
 
+    -fx-background-color: white;
 
-        -fx-background-radius: 12;
+    -fx-background-radius: 12;
     -fx-border-radius: 12;
 
     -fx-border-color: #E2E8F0;
@@ -37,12 +37,12 @@
     -fx-padding: 15;
 
     -fx-effect: dropshadow(
-        gaussian,
-        rgba(0,0,0,0.08),
-        10,
-        0,
-        0,
-        2
+            gaussian,
+            rgba(0,0,0,0.08),
+            10,
+            0,
+            0,
+            2
     );
 }
 
@@ -51,12 +51,16 @@
    ====================================================== */
 
 .button {
+
     -fx-background-radius: 8;
+
     -fx-font-weight: bold;
+
     -fx-cursor: hand;
 }
 
 .button:hover {
+
     -fx-opacity: 0.90;
 }
 
@@ -67,6 +71,7 @@
 .text-field,
 .combo-box,
 .text-area {
+
     -fx-background-radius: 8;
     -fx-border-radius: 8;
 
@@ -79,6 +84,7 @@
 .text-field:focused,
 .combo-box:focused,
 .text-area:focused {
+
     -fx-border-color: #1976D2;
 }
 
@@ -87,6 +93,7 @@
    ====================================================== */
 
 .table-view {
+
     -fx-background-color: white;
 
     -fx-background-radius: 10;
@@ -96,30 +103,122 @@
 }
 
 .table-view .column-header {
+
     -fx-background-color: #1E293B;
 }
 
 .table-view .column-header .label {
+
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .table-row-cell:odd {
+
     -fx-background-color: #FAFAFA;
 }
 
 .table-row-cell:even {
+
     -fx-background-color: white;
 }
 
 .table-row-cell:selected {
+
     -fx-background-color: #D6E9FF;
 }
 
+/* ======================================================
+   SIDEBAR
+   ====================================================== */
+
+.sidebar {
+
+    -fx-background-color: #1E293B;
+
+    -fx-padding: 20;
+
+    -fx-spacing: 10;
+}
+
+.sidebar-logo {
+
+    -fx-text-fill: white;
+
+    -fx-font-size: 22px;
+
+    -fx-font-weight: bold;
+
+    -fx-padding: 0 0 25 0;
+}
+.menu-button {
+
+    -fx-background-color: transparent;
+
+    -fx-text-fill: white;
+
+    -fx-font-size: 14px;
+
+    -fx-font-weight: bold;
+
+    -fx-alignment: CENTER_LEFT;
+
+    -fx-pref-width: 160px;
+
+    -fx-padding: 10;
+}
+
+.menu-button:hover {
+
+    -fx-background-color: #334155;
+
+    -fx-background-radius: 8;
+}
+
+.menu-button-active {
+
+    -fx-background-color: #475569;
+
+    -fx-background-radius: 8;
+
+    -fx-text-fill: white;
+
+    -fx-border-color: #3B82F6;
+
+    -fx-border-width: 0 0 0 4;
+}
+
+.menu-button:pressed {
+
+    -fx-background-color: #475569;
+
+    -fx-background-radius: 8;
+}
+
+.dashboard-card {
+
+    -fx-alignment: center;
+
+    -fx-padding: 10;
+
+    -fx-pref-width: 170px;
+
+    -fx-pref-height: 110px;
+
+    -fx-min-height: 110px;
+}
+
+.menu-button-active {
+
+    -fx-background-color: #1976D2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
 /* ======================================================
    SCROLL
    ====================================================== */
 
 .scroll-bar {
+
     -fx-background-color: transparent;
 }

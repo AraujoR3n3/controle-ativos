@@ -13,16 +13,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 
-import com.ativos.view.DashboardView;
-import com.ativos.view.EmpresaView;
-import com.ativos.view.LocalidadeView;
+import com.ativos.view.EmpresasView;
 import com.ativos.controller.AtivoController;
+import com.ativos.view.LocalidadesView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,7 +51,7 @@ public class App extends Application {
                 new Label("🖥 Controle de Ativos");
 
         titulo.setStyle(
-                "-fx-font-size:20px;" +
+                "-fx-font-size:22px;" +
                         "-fx-font-weight:bold;"
         );
         titulo.setMaxWidth(Double.MAX_VALUE);
@@ -65,22 +66,23 @@ public class App extends Application {
         carregarEmpresas(cbEmpresa);
 
         cbEmpresa.setPromptText(
-                "Selecione a Empresa"
+                "Empresa"
         );
-
-        cbEmpresa.setPrefWidth(300);
 
 // ======================================================
 // CARREGAMENTO DE LOCALIDADES
 // ======================================================
 
-        ComboBox<String> cbUnidade = new ComboBox<>();
+        ComboBox<String> cbUnidade =
+                new ComboBox<>();
 
         carregarLocalidades(cbUnidade);
 
-        cbUnidade.setPromptText("Selecione o Local");
+        cbUnidade.setPromptText(
+                "Localidade"
+        );
 
-        cbEmpresa.setPrefWidth(350);
+        cbEmpresa.setPrefWidth(260);
         cbUnidade.setPrefWidth(300);
 
         cbEmpresa.setOnAction(e -> {
@@ -109,20 +111,11 @@ public class App extends Application {
                         cbEmpresa.getValue()
                 );
 
-                System.out.println(
-                        "Empresa selecionada: "
-                                + cbEmpresa.getValue()
-                );
 
                 ResultSet rs =
                         ps.executeQuery();
 
                 while (rs.next()) {
-
-                    System.out.println(
-                            "Empresa selecionada: "
-                                    + cbEmpresa.getValue()
-                    );
 
                     cbUnidade.getItems().add(
                             rs.getString("nome")
@@ -192,9 +185,7 @@ public class App extends Application {
         Button btnSalvar = new Button("Salvar");
         Button btnExportar = new Button("Exportar Excel");
         Button btnExcluir = new Button("Excluir");
-        Button btnLocalidades = new Button("Localidades");
-        Button btnEmpresas = new Button("Empresas");
-        Button btnDashboard = new Button("Dashboard");
+
         final boolean[] modoEdicao = {false};
         final String[] patrimonioOriginal = {""};
         Button btnEditar = new Button("Editar");
@@ -215,10 +206,6 @@ public class App extends Application {
                         "-fx-text-fill:white;"
         );
 
-        btnLocalidades.setStyle(
-                "-fx-background-color:#F57C00;" +
-                        "-fx-text-fill:white;"
-        );
 
         btnExportar.setStyle(
                 "-fx-background-color:#455A64;" +
@@ -230,7 +217,7 @@ public class App extends Application {
                 "Buscar patrimônio, host, equipamento ou responsável"
         );
 
-        txtBusca.setPrefWidth(950);
+        txtBusca.setPrefWidth(300);
 
         Button btnBuscar = new Button("Buscar");
 
@@ -243,10 +230,6 @@ public class App extends Application {
                         "-fx-font-weight:bold;"
         );
 
-        lblTotal.setStyle(
-                "-fx-font-size:18px;" +
-                        "-fx-font-weight:bold;"
-        );
 
         ComboBox<String> cbFiltroUnidade = new ComboBox<>();
 
@@ -287,7 +270,7 @@ public class App extends Application {
 // ======================================================
 
         TableView<String[]> tabela = new TableView<>();
-        txtObs.setPrefHeight(80);
+        txtObs.setPrefHeight(40);
         TableColumn<String[], String> colEmpresa =
                 new TableColumn<>("Empresa");
 
@@ -431,26 +414,6 @@ public class App extends Application {
                 )
         );
 
-        btnLocalidades.setOnAction(
-                e -> new LocalidadeView().show()
-        );
-
-        btnEmpresas.setOnAction(e -> {
-
-            EmpresaView view =
-                    new EmpresaView();
-
-            view.show();
-
-            view.getJanela().setOnHidden(event ->
-                    carregarEmpresas(cbEmpresa)
-            );
-        });
-
-        btnDashboard.setOnAction(
-                e -> new DashboardView().show()
-        );
-
 // ======================================================
 // EVENTO SALVAR
 // ======================================================
@@ -537,16 +500,24 @@ public class App extends Application {
         lblCadastro.getStyleClass()
                 .add("card-title");
 
+        HBox linhaBotoes = new HBox(
+                10,
+                btnSalvar,
+                btnEditar,
+                btnExcluir,
+                btnExportar
+        );
         VBox cardCadastro =
                 new VBox(
-                        10,
+                        5,
                         lblCadastro,
                         linhaEquipamento,
                         linhaSerial,
                         linhaPatrimonio,
                         linhaStatus,
                         txtResponsavel,
-                        txtObs
+                        txtObs,
+                        linhaBotoes
                 );
 
         cardCadastro.getStyleClass()
@@ -555,23 +526,25 @@ public class App extends Application {
         cbEmpresa.setMaxWidth(Double.MAX_VALUE);
         cbUnidade.setMaxWidth(Double.MAX_VALUE);
 
-        HBox linhaEmpresaUnidade = new HBox(
+        HBox linhaPesquisa = new HBox(
                 10,
                 cbEmpresa,
-                cbUnidade
-        );
-
-        HBox.setHgrow(cbEmpresa, Priority.ALWAYS);
-        HBox.setHgrow(cbUnidade, Priority.ALWAYS);
-        linhaEmpresaUnidade.setAlignment(Pos.CENTER_LEFT);
-
-        HBox linhaBusca = new HBox(
-                10,
+                cbUnidade,
                 txtBusca,
                 btnBuscar
         );
 
-        linhaBusca.setAlignment(Pos.CENTER);
+        HBox.setHgrow(txtBusca,
+                Priority.ALWAYS
+        );
+
+        txtBusca.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        linhaPesquisa.setAlignment(
+                Pos.CENTER_LEFT
+        );
 
 // ======================================================
 // CARD PESQUISA
@@ -585,55 +558,83 @@ public class App extends Application {
 
         VBox cardPesquisa =
                 new VBox(
-                        10,
+                        6,
                         lblPesquisa,
-                        linhaEmpresaUnidade,
-                        linhaBusca
+                        linhaPesquisa
                 );
 
         cardPesquisa.getStyleClass()
                 .add("card");
 
-        HBox linhaBotoes = new HBox(
-                10,
-                btnSalvar,
-                btnEditar,
-                btnExcluir,
-                btnLocalidades,
-                btnEmpresas,
-                btnDashboard,
-                btnExportar
-        );
 // ======================================================
 // CARD AÇÕES
 // ======================================================
 
-        Label lblAcoes =
-                new Label("⚡ Ações");
-
-        lblAcoes.getStyleClass()
-                .add("card-title");
-
-        VBox cardAcoes =
-                new VBox(
-                        10,
-                        lblAcoes,
-                        linhaBotoes
-                );
-
-        cardAcoes.getStyleClass()
-                .add("card");
 
         linhaBotoes.setAlignment(Pos.CENTER_LEFT);
 
+        Button btnMenuDashboard =
+                new Button("📊 Dashboard");
+
+        btnMenuDashboard.getStyleClass()
+                .add("menu-button");
+
+        btnMenuDashboard.getStyleClass()
+                .add("menu-button-active");
+
+
+        Button btnMenuAtivos =
+                new Button("📦 Ativos");
+
+        btnMenuAtivos.getStyleClass()
+                .add("menu-button");
+
+        Button btnMenuEmpresas =
+                new Button("🏢 Empresas");
+
+        btnMenuEmpresas.getStyleClass()
+                .add("menu-button");
+
+        Button btnMenuLocalidades =
+                new Button("📍 Localidades");
+
+        btnMenuLocalidades.getStyleClass()
+                .add("menu-button");
+
+
+        Label lblLogo =
+                new Label("📋 SGA");
+
+        lblLogo.getStyleClass()
+                .add("sidebar-logo");
+
+        VBox menuLateral = new VBox(
+                20,
+                lblLogo,
+                btnMenuDashboard,
+                btnMenuAtivos,
+                btnMenuEmpresas,
+                btnMenuLocalidades
+        );
+
+        menuLateral.setPadding(
+                new Insets(20)
+        );
+
+        menuLateral.setPrefWidth(220);
+
+        menuLateral.getStyleClass()
+                .add("sidebar");
+
         VBox layout = new VBox(10);
+        layout.setFillWidth(true);
+
         HBox linhaFiltro = new HBox(
                 20,
                 lblFiltro,
                 cbFiltroUnidade,
                 lblTotal
         );
-
 // ======================================================
 // CARD INVENTÁRIO
 // ======================================================
@@ -655,6 +656,11 @@ public class App extends Application {
         cardInventario.getStyleClass()
                 .add("card");
 
+        VBox.setVgrow(
+                cardInventario,
+                Priority.ALWAYS
+        );
+
         layout.setPadding(new Insets(20));
 
         VBox.setVgrow(
@@ -666,11 +672,385 @@ public class App extends Application {
                 titulo,
                 cardPesquisa,
                 cardCadastro,
-                cardAcoes,
                 cardInventario
         );
 
-        Scene scene = new Scene(layout, 1080, 650);
+        BorderPane root = new BorderPane();
+
+        StackPane areaConteudo =
+                new StackPane();
+
+        areaConteudo.getChildren()
+                .add(layout);
+
+        root.setLeft(menuLateral);
+
+        root.setCenter(areaConteudo);
+
+
+// ======================================
+// MÉTRICAS DO DASHBOARD
+// ======================================
+
+        int totalAtivos = 0;
+        int totalEmpresas = 0;
+        int totalLocais = 0;
+        int totalEstoque = 0;
+        int totalManutencao = 0;
+
+        try {
+
+            Connection conn =
+                    Database.connect();
+
+            Statement stmt =
+                    conn.createStatement();
+
+            ResultSet rs =
+                    stmt.executeQuery(
+                            "SELECT COUNT(*) total FROM ativos"
+                    );
+
+            if (rs.next()) {
+                totalAtivos = rs.getInt("total");
+            }
+
+            rs = stmt.executeQuery(
+                    "SELECT COUNT(*) total FROM empresas"
+            );
+
+            if (rs.next()) {
+                totalEmpresas = rs.getInt("total");
+            }
+
+            rs = stmt.executeQuery(
+                    "SELECT COUNT(*) total FROM unidades"
+            );
+
+            if (rs.next()) {
+                totalLocais = rs.getInt("total");
+            }
+            rs = stmt.executeQuery(
+                    """
+                    SELECT COUNT(*) total
+                    FROM ativos
+                    WHERE status = 'Estoque'
+                    """
+            );
+
+            if (rs.next()) {
+                totalEstoque = rs.getInt("total");
+            }
+
+            rs = stmt.executeQuery(
+                    """
+                    SELECT COUNT(*) total
+                    FROM ativos
+                    WHERE status = 'Manutenção'
+                    """
+            );
+
+            if (rs.next()) {
+                totalManutencao = rs.getInt("total");
+            }
+
+            conn.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        Label lblDashboard =
+                new Label("📊 Dashboard");
+
+        lblDashboard.getStyleClass()
+                .add("card-title");
+        Label lblSubtitulo =
+                new Label(
+                        "Visão geral do ambiente"
+                );
+
+        lblSubtitulo.setStyle(
+                "-fx-text-fill:#666666;"
+        );
+
+// ======================
+// Ativos
+// ======================
+
+        Label lblAtivos =
+                new Label("📦 Ativos");
+
+        lblAtivos.setStyle(
+                "-fx-font-size:20px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblTotalAtivos =
+                new Label(String.valueOf(totalAtivos));
+
+        lblTotalAtivos.setStyle(
+                "-fx-font-size:25px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+
+// ======================
+// Empresas
+// ======================
+
+        Label lblEmpresas =
+                new Label("🏢 Empresas");
+
+        lblEmpresas.setStyle(
+                "-fx-font-size:22px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblTotalEmpresas =
+                new Label(String.valueOf(totalEmpresas));
+
+        lblTotalEmpresas.setStyle(
+                "-fx-font-size:25px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+
+// ======================
+// Localidades
+// ======================
+
+        Label lblLocais =
+                new Label("📍 Locais");
+
+        lblLocais.setStyle(
+                "-fx-font-size:22px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblTotalLocais =
+                new Label(String.valueOf(totalLocais));
+
+        Label lblEstoque =
+                new Label("📋 Estoque");
+
+        lblEstoque.setStyle(
+                "-fx-font-size:22px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblTotalEstoque =
+                new Label(String.valueOf(totalEstoque));
+
+        lblTotalEstoque.setStyle(
+                "-fx-font-size:25px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblManutencao =
+                new Label("🔧 Manutenção");
+
+        lblManutencao.setStyle(
+                "-fx-font-size:22px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        Label lblTotalManutencao =
+                new Label(String.valueOf(totalManutencao));
+
+        lblTotalManutencao.setStyle(
+                "-fx-font-size:30px;" +
+                        "-fx-font-weight:bold;"
+        );
+        lblTotalLocais.setStyle(
+                "-fx-font-size:25px;" +
+                        "-fx-font-weight:bold;"
+        );
+
+        VBox cardAtivos =
+                new VBox(
+                        15,
+                        lblAtivos,
+                        lblTotalAtivos
+                );
+
+        VBox cardEmpresas =
+                new VBox(
+                        15,
+                        lblEmpresas,
+                        lblTotalEmpresas
+                );
+
+        VBox cardLocais =
+                new VBox(
+                        15,
+                        lblLocais,
+                        lblTotalLocais
+                );
+
+        VBox cardEstoque =
+                new VBox(
+                        15,
+                        lblEstoque,
+                        lblTotalEstoque
+                );
+        VBox cardManutencao =
+                new VBox(
+                        15,
+                        lblManutencao,
+                        lblTotalManutencao
+                );
+        cardAtivos.getStyleClass()
+                .add("card");
+
+        cardEmpresas.getStyleClass()
+                .add("card");
+
+        cardLocais.getStyleClass()
+                .add("card");
+
+        cardAtivos.getStyleClass()
+                .add("dashboard-card");
+
+        cardEstoque.getStyleClass()
+                .add("card");
+
+        cardEmpresas.getStyleClass()
+                .add("dashboard-card");
+
+        cardLocais.getStyleClass()
+                .add("dashboard-card");
+
+        cardEstoque.getStyleClass()
+                .add("dashboard-card");
+
+        cardEstoque.getStyleClass()
+                .add("card-estoque");
+        cardManutencao.getStyleClass()
+                .add("card");
+
+        cardManutencao.getStyleClass()
+                .add("dashboard-card");
+
+        cardManutencao.getStyleClass()
+                .add("card-manutencao");
+
+
+        HBox linhaCards =
+                new HBox(
+                        20,
+                        cardAtivos,
+                        cardEmpresas,
+                        cardLocais,
+                        cardEstoque,
+                        cardManutencao
+                );
+
+        HBox.setHgrow(cardAtivos, Priority.ALWAYS);
+        HBox.setHgrow(cardEmpresas, Priority.ALWAYS);
+        HBox.setHgrow(cardLocais, Priority.ALWAYS);
+        HBox.setHgrow(cardEstoque, Priority.ALWAYS);
+        HBox.setHgrow(cardManutencao, Priority.ALWAYS);
+
+        cardAtivos.setMaxWidth(Double.MAX_VALUE);
+        cardEmpresas.setMaxWidth(Double.MAX_VALUE);
+        cardLocais.setMaxWidth(Double.MAX_VALUE);
+        cardEstoque.setMaxWidth(Double.MAX_VALUE);
+        cardManutencao.setMaxWidth(Double.MAX_VALUE);
+
+        VBox dashboardView =
+                new VBox(20);
+
+        dashboardView.setPadding(
+                new Insets(20)
+        );
+
+        dashboardView.getChildren()
+                .addAll(
+                        lblDashboard,
+                        lblSubtitulo,
+                        linhaCards
+                );
+
+
+        EmpresasView empresasView =
+                new EmpresasView();
+        LocalidadesView localidadesView =
+                new LocalidadesView();
+
+// ======================================
+// NAVEGAÇÃO
+// ======================================
+
+        btnMenuDashboard.setOnAction(e -> {
+
+            ativarMenu(
+                    btnMenuDashboard,
+                    btnMenuDashboard,
+                    btnMenuAtivos,
+                    btnMenuEmpresas,
+                    btnMenuLocalidades
+            );
+
+            areaConteudo.getChildren().clear();
+
+            areaConteudo.getChildren()
+                    .add(dashboardView);
+        });
+
+        btnMenuAtivos.setOnAction(e -> {
+
+            ativarMenu(
+                    btnMenuAtivos,
+                    btnMenuDashboard,
+                    btnMenuAtivos,
+                    btnMenuEmpresas,
+                    btnMenuLocalidades
+            );
+
+            areaConteudo.getChildren().clear();
+
+            areaConteudo.getChildren()
+                    .add(layout);
+        });
+
+        btnMenuEmpresas.setOnAction(e -> {
+
+            ativarMenu(
+                    btnMenuEmpresas,
+                    btnMenuDashboard,
+                    btnMenuAtivos,
+                    btnMenuEmpresas,
+                    btnMenuLocalidades
+            );
+
+            areaConteudo.getChildren().clear();
+
+            areaConteudo.getChildren()
+                    .add(
+                            empresasView.getView()
+                    );
+        });
+
+        btnMenuLocalidades.setOnAction(e -> {
+
+            ativarMenu(
+                    btnMenuLocalidades,
+                    btnMenuDashboard,
+                    btnMenuAtivos,
+                    btnMenuEmpresas,
+                    btnMenuLocalidades
+            );
+
+            areaConteudo.getChildren().clear();
+
+            areaConteudo.getChildren()
+                    .add(
+                            localidadesView.getView()
+                    );
+        });
+
+        Scene scene = new Scene(root, 1300, 750);
 
         scene.getStylesheets().add(
                 getClass()
@@ -681,9 +1061,30 @@ public class App extends Application {
         stage.setTitle("Controle de Ativos");
 
         stage.setScene(scene);
+        stage.setWidth(1100);
+        stage.setHeight(700);
 
+        stage.centerOnScreen();
         stage.show();
+    }
 
+// =====================================
+// MENU ATIVO
+// =====================================
+
+    private void ativarMenu(
+            Button ativo,
+            Button... botoes
+    ) {
+
+        for (Button botao : botoes) {
+
+            botao.getStyleClass()
+                    .remove("menu-button-active");
+        }
+
+        ativo.getStyleClass()
+                .add("menu-button-active");
     }
 
 // ======================================================
